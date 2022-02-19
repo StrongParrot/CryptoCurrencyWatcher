@@ -1,0 +1,2 @@
+# CryptoCurrencyWatcher
+ first REST servicee
