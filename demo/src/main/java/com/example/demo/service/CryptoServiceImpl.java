@@ -11,9 +11,11 @@ import java.util.Optional;
 @Service
 public class CryptoServiceImpl implements CryptoService{
     private final CryptoRep cryptoRep;
+    private final APIRequest apiRequest;
     @Autowired
-    public CryptoServiceImpl(CryptoRep cryptoRep) {
+    public CryptoServiceImpl(CryptoRep cryptoRep,APIRequest apiRequest) {
         this.cryptoRep = cryptoRep;
+        this.apiRequest =apiRequest;
     }
 
     @Override
@@ -52,41 +54,17 @@ public class CryptoServiceImpl implements CryptoService{
     }
 
     @Override
-    public double  getActualPrice(String name){
-        RestTemplate answer=new RestTemplate();
-        String map="";
-
-        if(name.equals("BTC")){
-
-            String URLBTC = "https://api.coinlore.net/api/ticker/?id=90";
-            map=(answer.getForObject(URLBTC,map.getClass()));
-            map=map.replaceAll(",",":");
-            map=map.replaceAll("\""," ");
-            String[] split=map.split(":");
-            map=split[11];
-            return Double.parseDouble(map);
+    public double setActualPrice(String cryptoName){
+        if(cryptoName.equals("BTC")) {
+            Crypto[] crypto = apiRequest.getCrypto(90);
+            return crypto[0].getPrice();
         }
-        if(name.equals("ETH")){
-
-            String URLETH = "https://api.coinlore.net/api/ticker/?id=80";
-            map=(answer.getForObject(URLETH,map.getClass()));
-            map=map.replaceAll(",",":");
-            map=map.replaceAll("\""," ");
-            String[] split=map.split(":");
-
-            map=split[11];
-            return Double.parseDouble(map);
+        if (cryptoName.equals("ETH")){
+            Crypto[] crypto=apiRequest.getCrypto(80);
+            return crypto[0].getPrice();
         }
 
-
-        String URLSOL = "https://api.coinlore.net/api/ticker/?id=48543";
-        map=(answer.getForObject(URLSOL,map.getClass()));
-        map=map.replaceAll(",",":");
-        map=map.replaceAll("\""," ");
-        String[] split=map.split(":");
-
-        map=split[11];
-
-        return Double.parseDouble(map);
+        Crypto[] crypto=apiRequest.getCrypto(48543);
+        return crypto[0].getPrice();
     }
 }

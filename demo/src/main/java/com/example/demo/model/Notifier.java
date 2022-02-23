@@ -67,49 +67,11 @@ public class Notifier extends Thread {
         return (int) ( (100*(Math.max(v1,v2)-Math.min(v1, v2))/v1));
     }
 
-    private synchronized double  getActualPrice(String name){
-        RestTemplate answer=new RestTemplate();
-        String map="";
-
-
-        if(name.equals("BTC")){
-
-            String URLBTC = "https://api.coinlore.net/api/ticker/?id=90";
-            map=(answer.getForObject(URLBTC,map.getClass()));
-            map=map.replaceAll(",",":");
-            map=map.replaceAll("\""," ");
-            String[] split=map.split(":");
-            map=split[11];
-            return Double.parseDouble(map);
-        }
-        if(name.equals("ETH")){
-
-            String URLETH = "https://api.coinlore.net/api/ticker/?id=80";
-            map=(answer.getForObject(URLETH,map.getClass()));
-            map=map.replaceAll(",",":");
-            map=map.replaceAll("\""," ");
-            String[] split=map.split(":");
-
-            map=split[11];
-            return Double.parseDouble(map);
-        }
-
-
-        String URLSOL = "https://api.coinlore.net/api/ticker/?id=48543";
-        map=(answer.getForObject(URLSOL,map.getClass()));
-        map=map.replaceAll(",",":");
-        map=map.replaceAll("\""," ");
-        String[] split=map.split(":");
-
-        map=split[11];
-
-        return Double.parseDouble(map);
-    }
 
     private synchronized void updateCryptos(List<Crypto> list){
         for (Crypto c :
                 list) {
-            c.setPrice(getActualPrice(c.getSymbol()));
+            c.setPrice(cryptoService.setActualPrice(c.getSymbol()));
             cryptoService.update(c, c.getId());
         }
     }

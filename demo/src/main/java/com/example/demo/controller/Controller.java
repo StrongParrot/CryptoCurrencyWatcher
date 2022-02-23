@@ -3,8 +3,11 @@ package com.example.demo.controller;
 import com.example.demo.model.Client;
 import com.example.demo.model.Crypto;
 import com.example.demo.model.Notifier;
+import com.example.demo.service.APIRequest;
 import com.example.demo.service.ClientService;
 import com.example.demo.service.CryptoService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.*;
@@ -24,20 +27,24 @@ public class Controller  {
     private final ClientService clientService;
     private final CryptoService cryptoService;
 
+    APIRequest apiRequest;
+
     @Autowired
-    public Controller( ClientService clientService, CryptoService cryptoService,Notifier notifier) {
+    public Controller( ClientService clientService, CryptoService cryptoService,Notifier notifier,APIRequest apiRequest) {
         this.clientService = clientService;
         this.cryptoService = cryptoService;
         this.notifier=notifier;
-        cryptoService.create(new Crypto(90L,"BTC",cryptoService.getActualPrice("BTC")));
-        cryptoService.create(new Crypto(80L,"ETH",cryptoService.getActualPrice("ETH")));
-        cryptoService.create(new Crypto(48543L,"SOL",cryptoService.getActualPrice("SOL")));
+        cryptoService.create(new Crypto(90L,"BTC",cryptoService.setActualPrice("BTC")));
+        cryptoService.create(new Crypto(80L,"ETH",cryptoService.setActualPrice("ETH")));
+        cryptoService.create(new Crypto(48543L,"SOL",cryptoService.setActualPrice("SOL")));
+        this.apiRequest=apiRequest;
     }
 
 
     @PostMapping(value = "/clients")
     public ResponseEntity<?> notify(@RequestBody Client client) {
-        client.setPrice(cryptoService.getActualPrice(client.getCryptoName()));
+       // client.setPrice(cryptoService.getActualPrice(client.getCryptoName()));
+        client.setPrice(cryptoService.setActualPrice(client.getCryptoName()));
         clientService.create(client);
         notifier.addNotify(client);
         return new ResponseEntity<>(HttpStatus.CREATED);}
@@ -120,6 +127,7 @@ public class Controller  {
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
+
 
 
 

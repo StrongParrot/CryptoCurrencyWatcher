@@ -22,5 +22,5 @@ public interface CryptoService {
 
     boolean delete(Long id);
 
-    double  getActualPrice(String name);
+    double setActualPrice(String cryptoName);
 }
